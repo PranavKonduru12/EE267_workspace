@@ -98,72 +98,30 @@ G = im2gray(I);
 % Convert G to double for proper convolution
 G = double(G);
 
-% Define a Laplacian kernel (4-neighborhood)
-laplace_kernel = [ 0 -1  0; 
-                  -1  4 -1; 
-                   0 -1  0];
+% Define Prewitt kernel for horizontal edges
+prewitt_x = [-1 0 1; -1 0 1; -1 0 1];
 
-% Apply convolution to get the Laplacian image
-laplace_result = conv2(G, laplace_kernel, 'same');
+% Define Prewitt kernel for vertical edges
+prewitt_y = [-1 -1 -1; 0 0 0; 1 1 1];
 
-% Sharpen the image by subtracting the Laplacian (scaling factor can be adjusted)
-alpha = 2.5;  % Sharpen image with this value
-I_sharp = G + alpha * laplace_result;
+% Apply convolution with the horizontal filter
+Gx_p = conv2(G, prewitt_x, 'same');
 
-% Optionally, clip the values to [0, 255] if needed
-I_sharp(I_sharp < 0) = 0;
-I_sharp(I_sharp > 255) = 255;
+% Apply convolution with the vertical filter
+Gy_p = conv2(G, prewitt_y, 'same');
 
-% Display the original grayscale image
+% Compute the prewitt gradient magnitude (combining both filters)
+G_final_p = sqrt(Gx_p.^2 + Gy_p.^2); 
+
+% Display the results for Prewitt
+% figure;
+% imshow(Gx_p, []);
+% title('Horizontal Edge Detection (Prewitt X)');
+% 
+% figure;
+% imshow(Gy_p, []);
+% title('Vertical Edge Detection (Prewitt Y)');
+
 figure;
-imshow(uint8(G));
-title('Original Grayscale Image');
-
-% Display the Laplacian filtered image
-figure;
-imshow(laplace_result, []);
-title('Laplacian Filtered Image');
-
-% Display the sharpened image
-figure;
-imshow(uint8(I_sharp));
-title('Sharpened Image');
-%% Question 4
-
-I = imread('pelvis.png');
-G = im2gray(I);
-
-% Convert G to double for proper convolution
-G = double(G);
-
-% Define a Laplacian kernel (4-neighborhood)
-laplace_kernel = [ 0 -1  0; 
-                  -1  4 -1; 
-                   0 -1  0];
-
-% Apply convolution to get the Laplacian image
-laplace_result = conv2(G, laplace_kernel, 'same');
-
-% Sharpen the image by subtracting the Laplacian (scaling factor can be adjusted)
-alpha = 5.0;  % Sharpen image with this value
-I_sharp = G + alpha * laplace_result;
-
-% Optionally, clip the values to [0, 255] if needed
-I_sharp(I_sharp < 0) = 0;
-I_sharp(I_sharp > 255) = 255;
-
-% Display the original grayscale image
-figure;
-imshow(uint8(G));
-title('Original Grayscale Image');
-
-% Display the Laplacian filtered image
-figure;
-imshow(laplace_result, []);
-title('Laplacian Filtered Image');
-
-% Display the sharpened image
-figure;
-imshow(uint8(I_sharp));
-title('Sharpened Image');
-
+imshow(G_final_p, []);
+title('Gradient Magnitude (Combined Prewitt)');
